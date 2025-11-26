@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.env
+.env.*
+
+# Node/JS
+node_modules/
+frontend/node_modules/
+frontend/dist/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build artifacts
+*.swp
+*.swo
+*.DS_Store
+
+# Models & data artifacts (can be large)
+models/
+data/fisherai_dataset.csv
+
+# IDE
+.vscode/
+.idea/

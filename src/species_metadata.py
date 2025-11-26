@@ -1,0 +1,17 @@
+SPECIES_METADATA = {
+    "galjoen": {"time_pref": ["dawn", "evening"], "notes": "Rocky gullies, rough water"},
+    "kob": {"time_pref": ["evening", "dawn"], "notes": "Likes pushing tide and some color"},
+    "garrick": {"time_pref": ["dawn", "morning"], "notes": "Hunts baitfish near river mouths"},
+    "shad": {"time_pref": ["dawn"], "notes": "Aggressive in low light"},
+    "yellowtail": {"time_pref": ["morning"], "notes": "Offshore/pelagic shots when current is blue"},
+    "snoek": {"time_pref": ["morning"], "notes": "Shoals with bait balls, watch wind lanes"},
+    "steenbras": {"time_pref": ["morning"], "notes": "Sandbanks and holes, calmer swell"},
+    "bronze_whaler": {"time_pref": ["evening"], "notes": "Warmer water; handle safely"},
+    "roman": {"time_pref": ["morning", "evening"], "notes": "Reef-associated"},
+    "hottentot": {"time_pref": ["morning", "evening"], "notes": "Common reef fish"},
+    "baardman": {"time_pref": ["morning"], "notes": "Sandy flats feeder"},
+    "musselcracker": {"time_pref": ["morning"], "notes": "Structure and reef edges"},
+    "blacktail": {"time_pref": ["dawn", "evening"], "notes": "Abundant surf species"},
+    "bonito": {"time_pref": ["morning"], "notes": "Pelagic shoals, clean blue water"},
+    "leerfish": {"time_pref": ["dawn", "evening"], "notes": "Estuary mouths and surf points"},
+}
