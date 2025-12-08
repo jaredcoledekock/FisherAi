@@ -125,6 +125,11 @@ Build: `npm run build` → deploy `frontend/dist` to Vercel/Netlify. CORS on bac
 - Frontend: Vercel/Netlify from `/frontend` build output. Set `VITE_API_BASE=https://your-api-domain`.
 - Auth: Supabase/Auth0 can be added later; for now presets/feedback work with `X-User-Id`.
 
+### Render (FastAPI) quick settings
+- Build command: `pip install --upgrade pip && pip install -r requirements.txt`
+- Start command: `uvicorn src.api_main:app --host 0.0.0.0 --port $PORT`
+- Python: repo pins `3.11` via `.python-version`
+
 ---
 
 # 🐟 Future Improvements
