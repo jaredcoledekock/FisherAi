@@ -78,7 +78,9 @@ def fetch_open_meteo(lat: float, lon: float, date: datetime.date) -> Dict[str, A
         "https://marine-api.open-meteo.com/v1/marine"
         f"?latitude={lat}&longitude={lon}"
         f"&start_date={iso_date}&end_date={iso_date}"
-        "&hourly=wave_height,wave_direction,wave_period,sea_surface_temperature,sea_level"
+        # Request both swell_* and combined wave_* to reduce gaps
+        "&hourly=swell_wave_height,swell_wave_direction,swell_wave_period,"
+        "wave_height,wave_direction,wave_period,sea_surface_temperature,sea_level"
         f"&timezone={tz}"
     )
 
@@ -206,13 +208,26 @@ def fetch_hourly_bundle(lat: float, lon: float, date: datetime.date) -> List[Dic
     rows = []
     for i, t in enumerate(times):
         t_dt = _parse_time(t)
+        # Helper to convert m/s → km/h
+        def mps_to_kmh(val):
+            try:
+                return float(val) * 3.6
+            except Exception:
+                return 0
         # Base from Open-Meteo
-        wind_speed = _safe_get(om_weather.get("wind_speed_10m", []), i, 0)
+        wind_speed = mps_to_kmh(_safe_get(om_weather.get("wind_speed_10m", []), i, 0))
         wind_deg = _safe_get(om_weather.get("wind_direction_10m", []), i, 0)
         air_temp = _safe_get(om_weather.get("temperature_2m", []), i, 0)
-        swell_height = _safe_get(om_marine.get("wave_height", []), i, 0)
-        swell_period = _safe_get(om_marine.get("wave_period", []), i, 0)
-        swell_direction = _safe_get(om_marine.get("wave_direction", []), i, 0)
+        # Prefer swell-specific series; fallback to combined wave series
+        swell_height = _safe_get(om_marine.get("swell_wave_height", []), i, None)
+        if swell_height in (None, 0):
+            swell_height = _safe_get(om_marine.get("wave_height", []), i, 0)
+        swell_period = _safe_get(om_marine.get("swell_wave_period", []), i, None)
+        if swell_period in (None, 0):
+            swell_period = _safe_get(om_marine.get("wave_period", []), i, 0)
+        swell_direction = _safe_get(om_marine.get("swell_wave_direction", []), i, None)
+        if swell_direction in (None, 0):
+            swell_direction = _safe_get(om_marine.get("wave_direction", []), i, 0)
         sea_temp = _safe_get(om_marine.get("sea_surface_temperature", []), i, 0)
         sea_level = _safe_get(om_marine.get("sea_level", []), i, 0)
 
@@ -224,6 +239,10 @@ def fetch_hourly_bundle(lat: float, lon: float, date: datetime.date) -> List[Dic
         sg_height = _nearest(sg_rows, t_dt, "swell_height") if t_dt else None
         sg_period = _nearest(sg_rows, t_dt, "swell_period") if t_dt else None
         sg_temp = _nearest(sg_rows, t_dt, "sea_temp") if t_dt else None
+
+        # Convert override wind to km/h before merging
+        if owm_wind is not None:
+            owm_wind = mps_to_kmh(owm_wind)
 
         wind_speed, wind_src = merge_source_value(wind_speed, "open-meteo", owm_wind, "owm")
         wind_deg, winddeg_src = merge_source_value(wind_deg, "open-meteo", owm_deg, "owm")
@@ -381,8 +400,9 @@ def score_window(
             "legal": SPECIES_LEGAL_NOTES.get(sp, ""),
         })
 
-    wind_speed = features.get("wind_speed", 0)
-    wind_penalty = max(0, wind_speed - 12) * 1.2
+    wind_speed = features.get("wind_speed", 0)  # km/h
+    # Penalties tuned for km/h (approx old m/s thresholds * 3.6)
+    wind_penalty = max(0, wind_speed - 43) * 0.33
 
     swell_height = features.get("swell_height", 0)
     swell_penalty = max(0, swell_height - 2.5) * 5
@@ -402,16 +422,16 @@ def score_window(
     if facing_deg is not None:
         offshore = (facing_deg + 180) % 360
         delta = _angle_diff(wind_dir, offshore)
-        if delta <= 45 and wind_speed <= 15:
+        if delta <= 45 and wind_speed <= 54:
             wind_bonus = 6
-        elif delta <= 90 and wind_speed <= 12:
+        elif delta <= 90 and wind_speed <= 43:
             wind_bonus = 3
 
     base = sum(species_scores)
     score = max(0, base - wind_penalty - swell_penalty + time_bonus + wind_bonus)
 
     explanation = (
-        f"Wind {wind_speed:.0f} kt @ {features.get('wind_deg', 0):.0f}°, "
+        f"Wind {wind_speed:.0f} km/h @ {features.get('wind_deg', 0):.0f}°, "
         f"Swell {swell_height:.1f} m / {features.get('swell_period', 0):.1f} s, "
         f"Tide {features.get('tide_phase', 'Unknown')}"
     )

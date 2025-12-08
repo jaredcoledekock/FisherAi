@@ -142,7 +142,7 @@ function ResultsList({ results, area, userId }: Props) {
               </div>
 
               <div className="metrics-row">
-                <MetricBar label="Wind" value={row.wind_speed} min={0} max={30} unit="kt" />
+                <MetricBar label="Wind" value={row.wind_speed} min={0} max={70} unit="km/h" />
                 <MetricBar
                   label="Swell"
                   value={row.swell_height}
