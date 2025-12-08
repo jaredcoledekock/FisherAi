@@ -1,5 +1,7 @@
 import datetime
 import os
+import sys
+from pathlib import Path
 from typing import List, Optional, Any, Dict
 
 import joblib
@@ -7,6 +9,12 @@ import jwt
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+# Ensure src modules are importable when uvicorn runs from repo root
+BASE_DIR = Path(__file__).resolve().parent
+ROOT_DIR = BASE_DIR.parent
+sys.path.append(str(BASE_DIR))
+sys.path.append(str(ROOT_DIR))
 
 from species_rules import get_species_list, baits_for, species_notes
 from collect_data import fetch_openweather, fetch_open_meteo, fetch_tide_phase
