@@ -266,4 +266,6 @@ def home():
 # MAIN
 # --------------------------------------------------------
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    # Railway (and similar PaaS) injects PORT; default to 5000 locally.
+    port = int(os.environ.get("PORT", 5000))
+    app.run(port=port, host="0.0.0.0")
