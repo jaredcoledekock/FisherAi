@@ -21,7 +21,7 @@ pnpm-debug.log*
 *.DS_Store
 
 # Models & data artifacts (can be large)
-models/
+# models/  # models now tracked for deployment
 data/fisherai_dataset.csv
 
 # IDE
