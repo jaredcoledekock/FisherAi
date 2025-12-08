@@ -22,6 +22,10 @@ app = Flask(__name__)
 CORS(app)
 
 MODEL_DIR = "models/"
+# Render/Fly/Linux filesystems are case-sensitive; ensure the path matches the
+# actual trained model directory.
+if not os.path.exists(MODEL_DIR) and os.path.exists("Models/"):
+    MODEL_DIR = "Models/"
 
 # --------------------------------------------------------
 # LOAD ALL MODELS + LABEL ENCODERS AT STARTUP

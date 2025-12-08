@@ -1,7 +1,13 @@
+import os
+from pathlib import Path
 import pandas as pd
 
-# Load all species rules from CSV once at import
-RULES_PATH = "data/species_rules.csv"
+# Load all species rules from CSV once at import; handle case-sensitive paths
+RULES_PATH = Path("data/species_rules.csv")
+if not RULES_PATH.exists():
+    alt = Path("Data/species_rules.csv")
+    if alt.exists():
+        RULES_PATH = alt
 rules_df = pd.read_csv(RULES_PATH)
 
 def get_species_list():
