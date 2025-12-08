@@ -1,0 +1,7 @@
+[build]
+  base = "frontend-next"
+  command = "npm run build"
+  publish = ".next"
+
+# Set NEXT_PUBLIC_API_BASE in the Netlify UI (Site settings → Environment variables)
+# to point to your Render backend, e.g., https://fisherai-1.onrender.com
